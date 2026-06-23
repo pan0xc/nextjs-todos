@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Spinner } from "./ui/spinner";
+import { createTodo, emptydeletedTodos } from "@/lib/todos";
 
 export function ToggleTodoActionButton({ todo }: { todo: TodoModel }) {
     const { pending } = useFormStatus();
@@ -57,16 +58,11 @@ export function EmptyTodoActionButton({ count }: { count: number }) {
     )
 }
 
-export function CreateTodoActionButton() {
+export function CreateTodoButton() {
     const { pending } = useFormStatus();
 
     return (
         <>
-            <Input
-                type="text"
-                name="text"
-                placeholder="Please Input Todo"
-            />
             <Button
                 type="submit"
                 disabled={pending}
@@ -74,6 +70,35 @@ export function CreateTodoActionButton() {
                 {pending && <Spinner data-icon="inline-start" />}
                 New
             </Button>
+        </>
+    )
+}
+
+export function CreateTodoForm() {
+
+    return (
+        <>
+            <form
+                action={createTodo}
+                className="flex justify-center gap-2"
+            >
+                <Input
+                    type="text"
+                    name="text"
+                    placeholder="Please Input Todo"
+                />
+                <CreateTodoButton />
+            </form>
+        </>
+    )
+}
+
+export function EmptyDeletedTodsForm({ count }: { count: number }) {
+    return (
+        <>
+            <form action={emptydeletedTodos.bind(null)}>
+                <EmptyTodoActionButton count={count} />
+            </form>
         </>
     )
 }

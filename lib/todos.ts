@@ -1,8 +1,11 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "./prisma";
 
 export async function getTodos() {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     return prisma.todo.findMany({
         where: {
             deleteAt: null
@@ -29,10 +32,18 @@ export async function getTodo(id: number) {
     })
 }
 
-export async function createTodo(text: string) {
-    return prisma.todo.create({
+export async function createTodo(formData: FormData) {
+    const text = formData.get("text")?.toString().trim();
+
+    if (!text) {
+        return;
+    }
+
+    await prisma.todo.create({
         data: { text }
     })
+
+    revalidatePath("/");
 }
 
 export async function updateTodo(
@@ -57,44 +68,54 @@ export async function toggleTodo(id: number) {
         throw new Error("Todo not found");
     }
 
-    return prisma.todo.update({
+    await prisma.todo.update({
         where: { id },
         data: {
             completed: !todo.completed,
         },
     });
+
+    revalidatePath("/");
 }
 
 export async function deleteTodo(id: number) {
-    return prisma.todo.update({
+    await prisma.todo.update({
         where: { id },
         data: {
             deleteAt: new Date()
         }
     });
+
+    revalidatePath("/");
 }
 
 export async function deleteAnywayTodo(id: number) {
-    return prisma.todo.delete({
+    await prisma.todo.delete({
         where: { id },
     });
+
+    revalidatePath("/");
 }
 
 export async function emptydeletedTodos() {
-    return prisma.todo.deleteMany({
+    await prisma.todo.deleteMany({
         where: {
             deleteAt: {
                 not: null
             }
         },
     });
+
+    revalidatePath("/");
 }
 
 export async function restoreTodo(id: number) {
-    return prisma.todo.update({
+    await prisma.todo.update({
         where: { id },
         data: {
             deleteAt: null
         }
     });
+
+    revalidatePath("/");
 }

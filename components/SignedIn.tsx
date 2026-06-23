@@ -1,10 +1,21 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+"use client";
 
-export default async function SignedIn({ children }: { children: React.ReactNode }) {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    })
+import { authClient } from "@/lib/auth-client";
+import { Skeleton } from "./ui/skeleton";
+
+export default function SignedIn({ children }: { children: React.ReactNode }) {
+    const {
+        data: session,
+        isPending
+    } = authClient.useSession();
+
+    if (isPending) {
+        return (
+            <>
+                <Skeleton className="h-14" />
+            </>
+        )
+    }
 
     if (!session) {
         return null

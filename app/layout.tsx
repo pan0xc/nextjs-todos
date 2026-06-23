@@ -21,7 +21,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("font-sans", InterSans.variable)}
     >
-      <body className="antialiased min-h-svh flex flex-col">
+      <body className="antialiased min-h-dvh flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
