@@ -4,118 +4,116 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "./prisma";
 
 export async function getTodos() {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    return prisma.todo.findMany({
-        where: {
-            deleteAt: null
-        },
-    })
+  return prisma.todo.findMany({
+    where: {
+      deleteAt: null
+    },
+  })
 }
 
 export async function getDeletedTodos() {
-    return prisma.todo.findMany({
-        where: {
-            deleteAt: {
-                not: null
-            }
-        },
-    })
+  return prisma.todo.findMany({
+    where: {
+      deleteAt: {
+        not: null
+      }
+    },
+  })
 }
 
 export async function getTodo(id: number) {
-    return prisma.todo.findMany({
-        where: {
-            id,
-            deleteAt: null
-        },
-    })
+  return prisma.todo.findMany({
+    where: {
+      id,
+      deleteAt: null
+    },
+  })
 }
 
 export async function createTodo(formData: FormData) {
-    const text = formData.get("text")?.toString().trim();
+  const text = formData.get("text")?.toString().trim();
 
-    if (!text) {
-        return;
-    }
+  if (!text) {
+    return;
+  }
 
-    await prisma.todo.create({
-        data: { text }
-    })
+  await prisma.todo.create({
+    data: { text }
+  })
 
-    revalidatePath("/");
+  revalidatePath("/");
 }
 
 export async function updateTodo(
-    id: number,
-    data: {
-        text?: string;
-        completed?: boolean;
-    }
+  id: number,
+  data: {
+    text?: string;
+    completed?: boolean;
+  }
 ) {
-    return prisma.todo.update({
-        where: { id },
-        data,
-    });
+  return prisma.todo.update({
+    where: { id },
+    data,
+  });
 }
 
 export async function toggleTodo(id: number) {
-    const todo = await prisma.todo.findUnique({
-        where: { id },
-    });
+  const todo = await prisma.todo.findUnique({
+    where: { id },
+  });
 
-    if (!todo) {
-        throw new Error("Todo not found");
-    }
+  if (!todo) {
+    throw new Error("Todo not found");
+  }
 
-    await prisma.todo.update({
-        where: { id },
-        data: {
-            completed: !todo.completed,
-        },
-    });
+  await prisma.todo.update({
+    where: { id },
+    data: {
+      completed: !todo.completed,
+    },
+  });
 
-    revalidatePath("/");
+  revalidatePath("/");
 }
 
 export async function deleteTodo(id: number) {
-    await prisma.todo.update({
-        where: { id },
-        data: {
-            deleteAt: new Date()
-        }
-    });
+  await prisma.todo.update({
+    where: { id },
+    data: {
+      deleteAt: new Date()
+    }
+  });
 
-    revalidatePath("/");
+  revalidatePath("/");
 }
 
 export async function deleteAnywayTodo(id: number) {
-    await prisma.todo.delete({
-        where: { id },
-    });
+  await prisma.todo.delete({
+    where: { id },
+  });
 
-    revalidatePath("/");
+  revalidatePath("/");
 }
 
 export async function emptydeletedTodos() {
-    await prisma.todo.deleteMany({
-        where: {
-            deleteAt: {
-                not: null
-            }
-        },
-    });
+  await prisma.todo.deleteMany({
+    where: {
+      deleteAt: {
+        not: null
+      }
+    },
+  });
 
-    revalidatePath("/");
+  revalidatePath("/");
 }
 
 export async function restoreTodo(id: number) {
-    await prisma.todo.update({
-        where: { id },
-        data: {
-            deleteAt: null
-        }
-    });
+  await prisma.todo.update({
+    where: { id },
+    data: {
+      deleteAt: null
+    }
+  });
 
-    revalidatePath("/");
+  revalidatePath("/");
 }
